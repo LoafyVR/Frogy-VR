@@ -1,0 +1,11 @@
+FROGY v3.1 — NIGHTFALL UPDATE
+
+This is SOURCE CODE, NOT an APK.
+
+1. Replace the files in the SAME GitHub folder Render already uses (see README.md).
+2. Render rebuilds the updated multiplayer server. Test it at your existing URL.
+3. Check on a physical Quest headset before trying to package it as an app.
+4. For an Android/Quest APK, use Meta's official WebXR PWA packaging guide with your hosted game's HTTPS URL and manifest, generate and host assetlinks.json, and build/sign the APK.
+5. Upload ONLY the signed APK (not the ZIP) to the Meta Horizon Developer Dashboard after testing.
+
+LIMITATIONS: A running multiplayer server is still required, even after you package the app. Shop saves depend on server data persistence; public voice needs reporting/moderation and network TURN support for production. No Quest hardware testing was possible in this environment. Store approval is not guaranteed.

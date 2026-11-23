@@ -1,0 +1,14 @@
+{
+  "name": "frogy",
+  "version": "0.3.1",
+  "private": true,
+  "description": "Frogy multiplayer frog horror WebXR game, Nightfall build with arm locomotion and cosmetics.",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/server.test.js && node test/features.test.js && node test/public.test.js && node test/branding.test.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT"
+}
