@@ -1,0 +1,54 @@
+FROG FRIGHT VR — APK PACKAGING PREPARATION
+===========================================
+This ZIP is NOT an APK. It adds the required web manifest, launcher icons,
+Quest PWA auto-VR launch, and in-headset CREATE/JOIN controls to the game.
+
+WHY IT CAN'T BE UPLOADED TO META YET
+------------------------------------
+The game's room codes, battles and coins run on `server.js`, so it needs a
+real HTTPS WebSocket hosting address. The hosted domain must be linked to
+an Android signing certificate to launch as an immersive Meta Quest PWA.
+That domain has not yet been provided.
+
+WHAT YOU NEED TO DO
+-------------------
+1. Put the whole folder on an HTTPS host with Node.js support and WebSockets.
+   Start command: node server.js
+   Test https://YOUR-DOMAIN/ and https://YOUR-DOMAIN/health .
+   Try it in Quest Browser before building. For persistent coins, use a
+   persistent disk/database: hosting providers' ephemeral disks lose data.
+
+2. Install Node.js 18+ and Meta's official Bubblewrap CLI on your computer:
+   npm install --global @meta-quest/bubblewrap-cli
+
+3. Make a new EMPTY folder on your computer, then inside it run:
+   bubblewrap init --manifest=https://YOUR-DOMAIN/manifest.webmanifest --metaquest
+   Choose IMMERSIVE app mode and a unique Android package ID.
+   Sign with your own release keystore and BACK IT UP.
+
+4. On the newly-generated Gradle project, set targetSdk = 32 in the
+   app module build.gradle as required by Meta docs. Replace jcenter()
+   with mavenCentral() if present.
+
+5. Generate digital asset links from your actual signing certificate:
+   bubblewrap fingerprint add YOUR_CERT_SHA256_FINGERPRINT
+   Take the generated assetlinks.json and publish it at:
+   https://YOUR-DOMAIN/.well-known/assetlinks.json
+   It MUST be reachable over HTTPS or immersive launch will fail.
+
+6. Build the signed real APK:
+   bubblewrap build
+   It should produce app-release-signed.apk. THIS is the file to upload
+   to Meta, after sideload testing on a Quest headset.
+
+READ OFFICIAL DOCUMENTATION:
+https://developers.meta.com/vr/documentation/web/pwa-packaging/
+https://developers.meta.com/vr/documentation/web/pwa-webxr/
+
+IMPORTANT LIMITATIONS:
+* Game/VR/headset/voice are experimental and have not been hardware-tested.
+* WebRTC voice on real networks may need TURN relay.
+* A public multiplayer release needs user safety tools, moderation,
+  policy/legal compliance and persistent account storage.
+* This only adds packaging prerequisites. It does not magically create a
+  native Android build or run a multiplayer server on the Quest device.

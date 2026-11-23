@@ -1,0 +1,9 @@
+{
+  "name": "frog-fright-vr",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Multiplayer frog horror party prototype with WebXR and arm-driven locomotion.",
+  "scripts": {"start": "node server.js", "test": "node test/server.test.js && node test/features.test.js"},
+  "engines": {"node": ">=22"},
+  "license": "MIT"
+}
