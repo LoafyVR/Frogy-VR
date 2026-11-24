@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "Frogy",
+  "short_name": "Frogy",
+  "description": "Frogy \u2014 cute frog survivors and a horrifying monster in a spooky multiplayer WebXR game.",
+  "start_url": "/?source=quest-app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#070e12",
+  "theme_color": "#070e12",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
