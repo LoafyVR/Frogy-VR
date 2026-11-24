@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#10152b">
+<title>Frogy — Moonlit Swamp v11.0 | Quest Horror</title>
+<link rel="manifest" href="/manifest.webmanifest"><link rel="icon" type="image/png" href="/icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head><body class="vr-only-landing">
+<canvas id="gl" aria-label="3D frog horror multiplayer arena"></canvas>
+<div id="glaze"></div><div id="crosshair"></div>
+<main id="vrOnlyGate" class="vrOnlyGate" role="main" aria-label="Frogy VR launcher">
+ <img class="vrOnlyLogo" src="/branding/frogy-logo.png" alt="Frogy" />
+ <h1>FROGY IS VR ONLY</h1>
+ <p>Play on Meta Quest 2, Quest 3, or Quest 3S through <b>Meta Quest Browser</b>.</p>
+ <p id="vrOnlyStatus" role="status">Checking VR headset support…</p>
+ <button id="vrOnlyEnter" class="vrOnlyEnter" disabled>🥽 ENTER FROGY VR</button>
+ <div class="vrOnlyHelp">Inside VR: move by pushing your arms at a relaxed standing height, including in the lobby, tap <b>A</b> to jump with momentum. Open the in-game menu with <b>left X</b>, or the <b>three-lines</b> button when Quest Browser exposes it. Open <b>SETTINGS</b> in the menu for music, sound effects, voice mute, and joystick turning.</div>
+ <div class="vrOnlyNote">Frogy v11.0 • No desktop or mobile gameplay • Quest testing still required</div>
+</main>
+<div class="shell">
+  <header class="topbar"><div class="wordmark"><img class="topbar-logo" src="/branding/frogy-logo.png" alt="Frogy" width="132" height="72"></div><div id="connection" class="connected"><span class="dot"></span> CONNECTING</div></header>
+  <section id="home" class="home panel">
+    <img class="brand-hero" src="/branding/frogy-logo.png" alt="Frogy game logo" width="320" height="173">
+    <div class="eyebrow">CUTE FROGS. REAL NIGHTMARES.</div>
+    <h1 class="hero-tagline">THE POND <em>BITES BACK.</em></h1>
+    <p class="lead">A dark multiplayer VR hunt. Hide in huge haunted environments, scavenge weapons, and survive the mutant Mega Frog. Locomotion uses your arms — never thumbstick walking in VR.</p>
+    <label class="caption-label" for="name">YOUR FROG NAME</label><input id="name" maxlength="18" placeholder="Sir Hopsalot" value="Lil Frog" autocomplete="nickname">
+    <div class="colors" aria-label="Choose frog color" id="colors"><button class="swatch active" data-color="mint" style="--s:#89ed9c" aria-label="Mint frog" title="Mint"></button><button class="swatch" data-color="pink" style="--s:#ff9ec3" title="Pink"></button><button class="swatch" data-color="lilac" style="--s:#bc9cff" title="Lilac"></button><button class="swatch" data-color="blue" style="--s:#83d9fb" title="Blue"></button><button class="swatch" data-color="peach" style="--s:#ffc28c" title="Peach"></button><button class="swatch" data-color="lime" style="--s:#d7f17e" title="Lime"></button></div>
+    <div class="actions"><button id="practice" class="practice-button">🎮 VR-ONLY · PRACTICE UNAVAILABLE <span>↗</span></button><button id="publicPlay" class="primary">🌐 JOIN PUBLIC ROOM · AUTO ON VR ENTRY <span>↗</span></button><button id="create" class="minor wide">🔒 CREATE PRIVATE LOBBY <span>↗</span></button><div class="join-form"><input id="codeInput" placeholder="5-LETTER CODE" maxlength="5" aria-label="Lobby code" autocapitalize="characters"><button id="join">JOIN CODE</button></div></div>
+    <p class="fine">FROGY v11.0 · 2–8 frogs per room · Public and private lobbies · Quest Browser test build</p>
+    <p id="error" class="error" aria-live="polite"></p>
+  </section>
+  <section id="lobby" class="lobby panel hidden" aria-label="Frogy multiplayer lobby">
+    <div class="lobby-brand"><img src="/branding/frogy-logo.png" alt="Frogy" width="128" height="69"><span>VR COMBAT · v11.0</span></div>
+    <div class="lobbyhead"><div><div class="eyebrow"><span id="roomVisibility">THE POND • LOBBY</span></div><h2 id="lobbyTitle">Waiting for frogs...</h2></div><div class="wallet">🦗 <span id="coinBalance">0</span> Crickets · 🏴‍☠️ <span id="dabloonBalance">0</span> Dabloons</div></div>
+    <div class="roomCode"><span id="roomCode">ABCDE</span><button id="copyCode" title="Copy the lobby code">COPY CODE ⧉</button></div>
+    <button id="publicAgain" class="minor publicAgain">🌐 SERVER HOP · NEW PUBLIC LOBBY</button><div class="lobbyTabs"><button class="selected" data-tab="pond">🐸 POND</button><button data-tab="shop">🦗 COSMETICS</button><button data-tab="tools">🛠️ TOOLS</button><button data-tab="closet">🎨 DRESS UP</button><button data-tab="terminal">💻 COMPUTER</button><button data-tab="inventory">🎒 INVENTORY</button><button data-tab="quests">📜 QUESTS</button><button data-tab="people">👥 PLAYERS</button><button data-tab="friends">💚 FRIENDS</button><button data-tab="settings">⚙️ SETTINGS</button></div>
+    <div id="tabPond" class="tabPane">
+      <div class="label-row"><span>FROGS IN THE POND</span><span id="lobbyCount">1 / 8</span></div><div id="roster" class="roster"></div>
+      <div class="label-row"><span>VOTE FOR NEXT MAP</span><span id="mapHostNote">EVERY FROG VOTES!</span></div>
+      <div id="mapSelect" class="maps"><button data-map="0" class="map active">🌲<span>ROTWOOD<br>SWAMP</span><small id="votes0">0</small></button><button data-map="1" class="map">🪦<span>GRAVEBELL<br>CEMETERY</span><small id="votes1">0</small></button><button data-map="2" class="map">☣️<span>HOLLOW CREEK<br>FACILITY</span><small id="votes2">0</small></button></div>
+      <div class="countdown" id="countdown">WAITING FOR 1 MORE FROG...</div><button id="voiceToggle" class="minor voice">🎙️ ENABLE VOICE CHAT (OPTIONAL)</button>
+      <p class="fine">Frog voices sound squeaky. Monster voices sound deep and spooky. Voice chat never records or saves audio.</p>
+    </div>
+    <div id="tabShop" class="tabPane hidden"><p id="shopStatus" class="shopStatus" role="status" aria-live="polite">Choose an item to buy or equip. Purchases are saved to your frog.</p><p class="lead small">Welcome to Ribbit's Boutique! Earn <b>100 Crickets per calendar day after midnight Eastern</b>. No real-money purchases.</p><div id="shopGrid" class="shopGrid"></div></div>
+    <div id="tabTools" class="tabPane hidden"><p class="lead small">Dabloons only · Buy tools to store in Inventory. Equip during a match. Each activation is used for that match only.</p><div id="toolsGrid" class="shopGrid"></div></div>
+    <div id="tabInventory" class="tabPane hidden"><div id="inventoryContents"></div></div>
+    <div id="tabQuests" class="tabPane hidden"><p class="lead small">Three daily challenges reset at midnight Eastern. Rewards are granted automatically on completion.</p><div id="questsContents"></div></div>
+    <div id="tabPeople" class="tabPane hidden"><div id="peopleContents"></div></div>
+    <div id="tabFriends" class="tabPane hidden"><div id="friendsContents"></div></div>
+    <div id="tabCloset" class="tabPane hidden"><p class="lead small">The Lily Pad Dressing Hut. Choose your color and wear anything you own!</p><div class="label-row">FROG COLORS • FREE</div><div id="closetColors" class="colors closetColors"></div><div id="rgbControl" class="rgbControl"></div><div id="outfits" class="outfits"></div></div>
+    <div id="tabTerminal" class="tabPane hidden"><div class="terminalTitle">💻 THE RIBBITRON 3000</div><p class="lead small">Enter a friend's five-character private room code to hop to their lobby.</p><div class="join-form"><input id="lobbyCodeInput" placeholder="ENTER ROOM CODE" maxlength="5" autocapitalize="characters"><button id="joinFromLobby">JOIN ROOM</button></div><p class="fine">You can also create a new room. Your hats and coins stay with your browser.</p><button id="newRoom" class="minor wide">➕ CREATE A NEW ROOM</button></div>
+    <div id="tabSettings" class="tabPane hidden"><div id="settingsControls" class="settingsControls"></div></div>
+    <div id="profileStats" class="profileStats">🐸 Profile loading...</div><div id="rewardTimer" class="rewardTimer">Next midnight Eastern reward: loading...</div>
+    <div class="lobbyActions"><button id="enterVR" class="primary">🥽 ENTER VR</button><button id="leave" class="minor">LEAVE LOBBY</button><button id="soundToggle" class="minor">🔊 SOUND ON</button></div>
+    <p class="fine" id="bonusNote">QUEST: use your trigger to operate the floating lobby computer</p>
+  </section>
+  <div id="desktopSettings" class="desktopSettings hidden"><div class="settingsTitle"><strong>⚙️ FROGY SETTINGS</strong><button id="closeDesktopSettings" class="minor">✕ CLOSE</button></div><div id="desktopSettingsControls" class="settingsControls"></div></div>
+  <button id="menuSettings" class="menuSettings hidden">⚙️ SETTINGS (M)</button><button id="exitPractice" class="exitPractice hidden">⤴ EXIT PRACTICE</button><div id="desktopPracticeHint" class="desktopPracticeHint hidden">CLICK TO LOCK MOUSE · WASD MOVE · SHIFT SPRINT · SPACE JUMP · F GRAB · G DROP · LEFT CLICK FIRE · 1/2/3 MAP · M SETTINGS</div>
+  <div id="hud" class="hud hidden"><div class="hudleft"><span class="tag" id="hudRoom">ROOM • XXXXX</span><span id="hudMap">Mossy Marsh</span></div><div class="hudcenter"><span id="hudStatus">WAITING FOR FROGS</span><strong id="hudTime">02:00</strong></div><div class="hudright"><span id="hudRole" class="role">SURVIVOR 🐸</span><span id="hudWeapon">🫧 UNARMED</span><span id="grabHint" class="grabHint">Grip a weapon to pick it up</span></div></div>
+  <div id="bottomhelp" class="bottomhelp hidden">QUEST: SWING/PUSH HANDS AT NATURAL ARM HEIGHT · <b>A</b> Jump + carry speed · <b>LEFT X</b> Toggle menu (3-lines if exposed) · <b>Hold grip</b> Grab part or weapon / Release grip Throw · <b>Trigger</b> Attack · Monster: <b>Right grip</b> Chomp · <b>Left grip</b> Rip · <b>B</b> Roar</div>
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <div id="vrbar" class="vrbar hidden"><button id="playVR">🥽 ENTER VR</button><button id="showLobby" class="minor">LOBBY / SHOP</button><button id="micHud" class="minor">🎙️ VOICE OFF</button></div>
+  <div id="endPanel" class="endPanel hidden"><strong id="endTitle">THE FROGS WIN!</strong><span id="endSubtitle">Next round starting soon...</span></div>
+  <div id="vrHelp" class="vrHelp hidden"></div>
+</div>
+<script src="bootstrap.js?v=11.0"></script>
+</body></html>

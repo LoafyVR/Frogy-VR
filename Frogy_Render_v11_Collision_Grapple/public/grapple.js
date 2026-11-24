@@ -1,0 +1,49 @@
+'use strict';
+/* B-triggered tongue tether: finite range, actual collider ray hit, smooth rope pull,
+   automatic release + cooldown. No client authority to teleport through walls. */
+const FrogyGrapple=(()=>{
+ const Collision=typeof window!=='undefined'?window.FrogyCollision:require('./collision.js');
+ const LIMIT=16,MAX_MS=1600,COOLDOWN_MS=450;
+ const add=(o,d,t)=>o.map((n,i)=>n+d[i]*t);
+ function rayBox(o,d,b,max){let min=0,maxT=max;
+  for(const [axis,lo,hi] of [[0,b.x-b.rx,b.x+b.rx],[1,.1,b.h],[2,b.z-b.rz,b.z+b.rz]]){
+   const v=d[axis];if(Math.abs(v)<1e-6){if(o[axis]<lo||o[axis]>hi)return null;continue;}
+   const t1=(lo-o[axis])/v,t2=(hi-o[axis])/v,near=Math.min(t1,t2),far=Math.max(t1,t2);min=Math.max(min,near);maxT=Math.min(maxT,far);if(maxT<min)return null;
+  }return min>.10?min:null;
+ }
+ function rayCylinder(o,d,b,max){const px=o[0]-b.x,pz=o[2]-b.z,a=d[0]*d[0]+d[2]*d[2];if(a<1e-8)return null;
+  const B=2*(px*d[0]+pz*d[2]),C=px*px+pz*pz-b.r*b.r,disc=B*B-4*a*C;if(disc<0)return null;
+  const roots=[(-B-Math.sqrt(disc))/(2*a),(-B+Math.sqrt(disc))/(2*a)];
+  for(const t of roots)if(t>.18&&t<max&&o[1]+d[1]*t>=.1&&o[1]+d[1]*t<=b.h+.2)return t;
+  return null;
+ }
+ function raycast(o,dir,mode='hub',world=null,max=LIMIT){
+  if(!o||!dir||o.length!==3||dir.length!==3)return null;
+  const len=Math.hypot(...dir);if(len<.1)return null;const d=dir.map(n=>n/len);let best=max+1,tag='';
+  const accept=(t,name)=>{if(t!==null&&t>0&&t<best){best=t;tag=name;}};
+  if(mode==='hub'){
+   for(const b of Collision.hubBoxes)accept(rayBox(o,d,b,max),b.name);
+   for(const p of Collision.parkour){accept(rayCylinder(o,d,{...p,h:p.h},max),'lily pad');
+    // Top plane can serve as a tongue landing surface.
+    if(d[1]<-.03){const t=(p.h-o[1])/d[1];const q=add(o,d,t);if(t>.18&&t<max&&Math.hypot(q[0]-p.x,q[2]-p.z)<=p.r)accept(t,'lily pad top');}
+   }
+   for(const axis of [0,2])for(const sign of [-1,1]){if(Math.abs(d[axis])<.01)continue;const t=(sign*Collision.hubBounds-o[axis])/d[axis],q=add(o,d,t);if(t>.15&&t<max&&q[1]>0&&q[1]<4&&Math.abs(q[2-axis])<=Collision.hubBounds)accept(t,'boundary');}
+  }else{
+   for(const b of world?.cover||[])accept(rayCylinder(o,d,b,max),b.type||'cover');
+   const limit=(world?.SIZE||65)-.5,ox=o[0],oz=o[2],A=d[0]*d[0]+d[2]*d[2],B=2*(ox*d[0]+oz*d[2]),C=ox*ox+oz*oz-limit*limit;
+   if(A>0){const disc=B*B-4*A*C;if(disc>=0){const t=(-B+Math.sqrt(disc))/(2*A);if(t>.15&&t<max&&o[1]+d[1]*t<5)accept(t,'arena wall');}}
+  }
+  if(best>max)return null;return {point:add(o,d,best),distance:best,surface:tag};
+ }
+ function activate(current,now,origin,direction,mode,world){if(current?.active)return {...current,active:false,readyAt:now+COOLDOWN_MS};if(now<(current?.readyAt||0))return current||{active:false,readyAt:now};const hit=raycast(origin,direction,mode,world);return hit?{active:true,point:hit.point,started:now,readyAt:0,surface:hit.surface}:{active:false,readyAt:now+150};}
+ function update(current,now,rig,vel,dt,menuOpen=false){if(!current?.active)return {state:current,velocity:vel};
+  const distance=Math.hypot(current.point[0]-rig.x,current.point[1]-(rig.y+1.0),current.point[2]-rig.z);
+  if(menuOpen||now-current.started>MAX_MS||distance<.72)return {state:{active:false,readyAt:now+COOLDOWN_MS},velocity:vel};
+  const dx=current.point[0]-rig.x,dy=current.point[1]-(rig.y+.9),dz=current.point[2]-rig.z,len=Math.hypot(dx,dy,dz)||1;
+  const speed=Math.min(12.5,2.8+distance*.95),blend=Math.min(1,dt*13);
+  return {state:current,velocity:{x:vel.x*(1-blend)+dx/len*speed*blend,y:vel.y*(1-blend)+dy/len*speed*blend,z:vel.z*(1-blend)+dz/len*speed*blend}};
+ }
+ return {LIMIT,MAX_MS,COOLDOWN_MS,raycast,activate,update};
+})();
+if(typeof window!=='undefined')window.FrogyGrapple=FrogyGrapple;
+if(typeof module!=='undefined'&&module.exports)module.exports=FrogyGrapple;
