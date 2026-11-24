@@ -1,0 +1,54 @@
+'use strict';
+const assert=require('node:assert/strict');
+const cp=require('node:child_process');
+const fs=require('node:fs');
+const os=require('node:os');
+const path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const dataDir=fs.mkdtempSync(path.join(os.tmpdir(),'frogy-v14-test-'));
+const PORT='33468';
+const child=cp.spawn(process.execPath,['server.js'],{cwd:root,
+ env:{...process.env,PORT,FROGY_DATA_DIR:dataDir,COUNTDOWN_MS:'700',ROUND_MS:'1450',INTERMISSION_MS:'400'},stdio:'pipe'});
+let errors='';child.stderr.on('data',b=>errors+=b.toString());
+const pause=ms=>new Promise(r=>setTimeout(r,ms));
+const peers=[];
+async function until(test,label='condition',ms=5500){const end=Date.now()+ms;while(Date.now()<end){const out=test();if(out)return out;await pause(30);}throw Error('Timeout '+label+'\n'+errors);}
+async function make(){const ws=new WebSocket(`ws://127.0.0.1:${PORT}/ws`),msgs=[];
+ ws.onmessage=e=>msgs.push(JSON.parse(e.data));
+ await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
+ const p={ws,msgs,send:x=>ws.send(JSON.stringify(x)),last:type=>msgs.filter(m=>m.type===type).at(-1)};peers.push(p);
+ p.send({type:'hello'});await until(()=>p.last('profile'),'initial profile');return p;
+}
+async function main(){await pause(380);
+ const p=await make();p.send({type:'create',name:'Solo Tester'});
+ const room=(await until(()=>p.last('joined'),'private room')).code;
+ const fresh=p.last('profile');
+ assert.equal(Object.hasOwn(fresh,'lilyAvailable'),false,'retired prize status is not exposed');
+ p.send({type:'redeemCode',code:'nPc'});
+ const spawned=await until(()=>p.last('codeResult')?.code==='NPC'&&p.last('codeResult')?.ok&&p.last('codeResult'),'NPC redeemed');
+ assert.match(spawned.message,/Practice Tadpole/);
+ const state=await until(()=>p.last('state')?.npcPractice&&p.last('state')?.players.length===2&&p.last('state'),'2 frogs');
+ assert.equal(state.players.filter(q=>q.isNpc).length,1);
+ assert.equal(state.players.filter(q=>!q.isNpc).length,1);
+ p.send({type:'redeemCode',code:'NPC'});
+ await until(()=>p.msgs.filter(m=>m.type==='codeResult'&&m.code==='NPC').length===2,'NPC repeated');
+ assert.equal(p.last('codeResult').ok,true);
+ assert.equal(p.last('state').players.length,2,'no bot stacking');
+ const round1=await until(()=>p.msgs.filter(m=>m.type==='state'&&m.phase==='playing'&&m.round===1).at(-1),'first solo round');
+ assert.equal(round1.players.find(q=>!q.isNpc).monster,true,'first solo round human is monster');
+ const duringCoins=p.last('profile').crickets;
+ const round2=await until(()=>p.msgs.filter(m=>m.type==='state'&&m.phase==='playing'&&m.round===2).at(-1),'second solo round',6900);
+ assert.equal(round2.players.find(q=>q.isNpc).monster,true,'second solo round NPC is idle monster');
+ assert.equal(p.last('profile').crickets,duringCoins,'no cost/reward mutation during solo round');
+ const friend=await make();friend.send({type:'join',code:room,name:'Second Frog'});
+ await until(()=>friend.last('joined')?.code===room,'join with bot');
+ const after=await until(()=>p.last('state')?.players.some(q=>q.name==='Second Frog')&&p.last('state'),'friend in state');
+ assert.equal(after.players.filter(q=>q.isNpc).length,0,'real player removes idle NPC');
+ assert.equal(after.players.length,2,'room has two humans only');
+ const publicTester=await make();publicTester.send({type:'public',name:'Public Tester'});
+ await until(()=>publicTester.last('joined'),'public room');publicTester.send({type:'redeemCode',code:'NPC'});
+ const invalid=await until(()=>publicTester.last('codeResult')?.code==='NPC'&&publicTester.last('codeResult'),'public rejection');assert.equal(invalid.ok,false);
+ const health=await(await fetch(`http://127.0.0.1:${PORT}/health`)).json();assert.equal(health.version,'15.1.0');
+ console.log('PASS v14: private solo NPC, countdown, alternating roles, repeated NPC without duplicates, friend evicts NPC, public denial');
+}
+main().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{for(const p of peers)try{p.ws.close();}catch{}child.kill();fs.rmSync(dataDir,{recursive:true,force:true});setTimeout(()=>process.exit(process.exitCode||0),180);});
