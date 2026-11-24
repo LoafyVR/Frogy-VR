@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict'),motion=require('../public/movement.js');
+assert.ok(motion.reachPlane(1.75)>1.45,'Relaxed standing hands should engage without crouching');
+assert.ok(motion.reachPlane(1.15)<motion.reachPlane(1.75),'The reach plane must adapt to height');
+assert.ok(motion.handPush([0,1.36,0],[0,1.31,-.1],.025,1.75,true,false),'Chest-to-waist arm push should work while standing');
+const hit=motion.handPush([.2,1.05,0],[.15,.95,-.14],.025,1.74,true,false);
+assert.ok(hit&&hit.dz>.1&&hit.vz>0,'Backwards arm push propels the avatar forward');
+assert.ok(hit.up>0,'Downward hand motion can create a small lift');
+assert.equal(motion.handPush([0,1.80,0],[.01,1.80,.2],.025,1.74,true,false),null,'Hands held near head should not trigger ground push');
+assert.equal(motion.handPush([0,.95,0],[0,.85,-.1],.025,1.74,false,false),null,'No floor-pushing in midair');
+assert.equal(motion.preserveJump({x:5,y:0,z:-3}).x,5,'Jump must preserve horizontal speed');
+assert.ok(motion.drag(false,.02)>motion.drag(true,.02),'Air momentum must last longer than ground momentum');
+console.log('PASS: calibrated relaxed-arm plane, push direction, airborne rule, jump momentum.');

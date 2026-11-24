@@ -1,0 +1,17 @@
+{
+  "name": "frogy",
+  "version": "0.6.1",
+  "private": true,
+  "description": "Frogy v6.1, lobby locomotion, Quest hand tracking fallback and stereo performance recovery",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/server.test.js && node test/features.test.js && node test/public.test.js && node test/branding.test.js && node test/haunted.test.js && node test/vr-only.test.js && node test/movement.test.js && node test/combat-physics.test.js && node test/lobby-movement.test.js && node test/tracking-sync.test.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

@@ -1,0 +1,20 @@
+'use strict';
+const assert=require('node:assert/strict');
+const m=require('../public/movement.js'),hub=require('../public/hub.js');
+assert.equal(m.canMove('home',false,false,true),true,'menu must not freeze lobby walking');
+assert.equal(m.canMove('lobby',true,false,true),true,'menu open should not stop walking in lobby');
+assert.equal(m.canMove('countdown',true,false,true),true,'lobby countdown movement');
+assert.equal(m.canMove('intermission',true,false,false),true,'intermission movement');
+assert.equal(m.canMove('playing',true,false,true),false,'open menu stops fighting but not hub');
+assert.equal(m.canMove('playing',true,false,false),true);
+assert.equal(m.canMove('playing',false,true,false),true,'waiting spectator may move in isolated hub, not game');
+assert.equal(m.canJump('home',false,false,true),true,'A jump also works before joining match');
+assert.equal(m.canJump('lobby',true,false,true),true,'A jump works while lobby menu is open');
+assert.deepEqual(m.preserveJump({x:6,y:0,z:-4}),{x:6,y:m.settings.jumpSpeed,z:-4});
+assert.ok(m.reachPlane(1.7)>1.60,'relaxed high hands should connect without crouching');
+assert.ok(m.handPush([0,1.4,0],[0,1.33,-.08],.02,1.7,true,false),'arm pushes at standing height');
+assert.ok(m.handPush([0,1.4,0],[0,1.33,-.08],.02,1.7,false,true),'wall push midair');
+for(let i=0;i<8;i++)assert.ok(hub.free(...hub.spawn(i)),'hub spawn must not clip walls/stations');
+for(const q of hub.stations){assert.equal(hub.free(q.x,q.z),false,'stations are solid');assert.ok(Math.hypot(q.x,q.z)<20,'stations stay inside hub');}
+assert.equal(hub.resolve(999,999).x,hub.LIMIT,'hub limit stops exterior falls');
+console.log('PASS: lobby can move during menu/countdown, standing arm pushes, A jumping and safe, unclipped hub coordinates.');
