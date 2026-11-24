@@ -1,0 +1,17 @@
+{
+  "name": "frogy",
+  "version": "0.6.2",
+  "private": true,
+  "description": "Frogy v6.2, anchored paw collision, X-menu controls, jumping and multiplayer avatar visibility",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/server.test.js && node test/features.test.js && node test/public.test.js && node test/branding.test.js && node test/haunted.test.js && node test/vr-only.test.js && node test/movement.test.js && node test/combat-physics.test.js && node test/lobby-movement.test.js && node test/tracking-sync.test.js && node test/paw-contact.test.js && node test/visibility.test.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}
