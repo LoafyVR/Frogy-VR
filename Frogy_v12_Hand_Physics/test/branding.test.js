@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path');
+const root=path.resolve(__dirname,'..'),pub=path.join(root,'public');
+const manifest=JSON.parse(fs.readFileSync(path.join(pub,'manifest.webmanifest'),'utf8'));
+const html=fs.readFileSync(path.join(pub,'index.html'),'utf8');
+assert.equal(manifest.name,'Frogy');
+assert.equal(manifest.short_name,'Frogy');
+assert.match(html,/<title>Frogy/);
+assert.match(html,/branding\/frogy-logo\.png/);
+assert.doesNotMatch(html,/FROG FRIGHT|Frog Fright/);
+assert.ok(fs.statSync(path.join(pub,'branding','frogy-original.png')).size>100000);
+for(const size of [192,512])assert.ok(fs.existsSync(path.join(pub,'icons',`icon-${size}.png`)));
+console.log('Frogy branding test passed');
