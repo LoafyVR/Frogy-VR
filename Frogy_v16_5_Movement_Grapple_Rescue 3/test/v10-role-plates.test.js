@@ -1,0 +1,37 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const file=fs.readFileSync(path.join(__dirname,'../public/game.js'),'utf8');
+const start=file.indexOf('const nameTags=new Map();');
+const end=file.indexOf('\nfunction drawScene(t,head=null)',start);
+assert.ok(start!==-1&&end>start,'client has role/nameplate renderer');
+let textureUploads=0,textureRefreshes=0,draws=0,transforms=[];
+const painted=[],gradientStops=[];
+const ctx={clearRect(){},beginPath(){},roundRect(){},fill(){},stroke(){},save(){},restore(){},clip(){},fillRect(){},moveTo(){},lineTo(){},closePath(){},
+ fillText(value){painted.push(String(value));},strokeText(){},createLinearGradient(){return {addColorStop(at,color){gradientStops.push(color);}};}};
+const document={createElement(tag){assert.equal(tag,'canvas');return {width:0,height:0,getContext(){return ctx;}};}};
+const functions=['createTexture','bindTexture','texParameteri','pixelStorei','texImage2D','texSubImage2D','enable','disable','blendFunc','depthMask','useProgram','uniformMatrix4fv','uniform1i','bindBuffer','enableVertexAttribArray','vertexAttribPointer','drawElements','activeTexture'];
+const gl={};for(const fn of functions)gl[fn]=()=>{};
+gl.createTexture=()=>({id:77});gl.texImage2D=()=>textureUploads++;gl.texSubImage2D=()=>textureRefreshes++;gl.drawElements=()=>draws++;
+const sandbox={document,gl,Math,performance:{now:()=>1000},tp:{p:0,pM:0,v:0,m:0,tex:0,a:0,uv:0},P:{},V:{},quadV:0,quadUV:0,quadI:0,
+ mat(x,y,z,sx,sy,sz,yaw){transforms.push({x,y,z,sx,sy,yaw});return {};}};
+vm.runInNewContext(file.slice(start,end)+'\nthis.tag=nameTagTexture;this.drawTag=drawNameTag;',sandbox,{filename:'frog-role-badges'});
+const owner={id:'o',name:'QueenFrog',ownerTag:true,modTag:true,x:1,y:0,z:2,alive:true};
+const mod={id:'m',name:'Helper',ownerTag:false,modTag:true,x:2,y:.4,z:2,alive:true};
+const normal={id:'p',name:'PondPal',x:0,y:0,z:2,alive:true};
+sandbox.tag(owner,1);assert.deepEqual(painted.slice(-2),['QueenFrog','OWNER']);
+assert.ok(gradientStops.includes('#fff6b9'),'owner has bright metallic gold highlights');
+assert.equal(textureUploads,1);
+sandbox.tag(owner,1.1);assert.equal(textureUploads,1);assert.equal(textureRefreshes,0,'same eye-frame does not re-upload');
+sandbox.tag(owner,1.45);assert.equal(textureRefreshes,1,'shimmer updates in-place rather than making new mesh');
+sandbox.tag(mod,2);assert.deepEqual(painted.slice(-2),['Helper','MOD']);
+assert.ok(gradientStops.includes('#d5f5ff'),'moderator has bright metallic blue highlights');
+sandbox.tag(normal,2);assert.equal(painted.at(-1),'PondPal');
+const head={x:0,z:-1};sandbox.drawTag(mod,head,3);
+assert.equal(draws,1,'exactly one world-space label rendered for mod');
+assert.equal(transforms.at(-1).y,mod.y+2.37,'role follows head/nametag height');
+assert.ok(Math.abs(transforms.at(-1).yaw-Math.atan2(-2,-3))<1e-9,'faces current viewer');
+sandbox.drawTag(mod,{x:5,z:2},3);
+assert.equal(draws,2,'each viewer renders its own label');
+assert.notEqual(transforms.at(-1).yaw,transforms.at(-2).yaw,'billboard faces individual viewers');
+console.log('PASS v10.1: OWNER metallic gold, MOD metallic blue, title above name, one viewer-facing nametag, low-rate shimmer');

@@ -1,0 +1,17 @@
+{
+  "name": "frogy",
+  "version": "16.5.0",
+  "private": true,
+  "description": "Frogy v16.5 Quest beta: no phantom paw contacts, blocked-grapple auto-release, mirrored hands, structural wall recovery, organic tongue mesh",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run-all.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}
