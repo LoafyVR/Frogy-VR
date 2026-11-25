@@ -1,0 +1,17 @@
+{
+  "name": "frogy",
+  "version": "16.1.0",
+  "private": true,
+  "description": "Frogy v16.1 Quest beta: ground push-off and lateral locomotion, fully oriented paws, mouth-only grapple and smaller denser maps",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run-all.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}
