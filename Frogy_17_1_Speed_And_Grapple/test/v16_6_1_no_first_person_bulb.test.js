@@ -1,0 +1,10 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const src=fs.readFileSync(path.join(__dirname,'../public/game.js'),'utf8');
+const local=src.split('function drawLocalBodyFirstPerson(')[1].split('function drawTongue(')[0];
+assert(local.includes('for(const side of [-1,1])'),'retain tracked arm and shoulder anchors');
+assert(!local.includes('dotBall('),'local VR first-person body must not have a blocking torso/belly bulb');
+assert(src.includes('function frog('),'third-person characters still rendered');
+console.log('PASS v16.6.1: no first-person torso bulb, arms and remote frogs preserved');
