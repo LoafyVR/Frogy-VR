@@ -1,0 +1,17 @@
+{
+  "name": "frogy",
+  "version": "16.6.0",
+  "private": true,
+  "description": "Frogy v16.6 Quest beta: stable anti-wobble arm strokes, tracked-head wall collision, nonduplicating weapons, optional Tadpole, physical step tutorial",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run-all.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}
