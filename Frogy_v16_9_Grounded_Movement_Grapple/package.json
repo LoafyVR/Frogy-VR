@@ -1,0 +1,17 @@
+{
+  "name": "frogy",
+  "version": "16.9.0",
+  "private": true,
+  "description": "Frogy v16.9: grounded-only contact movement, shared tongue cooldown, denser arenas, Camera Lab and microphone",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run-all.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}
