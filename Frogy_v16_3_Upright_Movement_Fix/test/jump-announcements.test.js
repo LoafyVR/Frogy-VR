@@ -1,0 +1,25 @@
+// Release regressions: duplicates, momentum, role bubbles, winners.
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const controls=require('../public/controls.js'),motion=require('../public/movement.js');
+const game=fs.readFileSync(path.join(__dirname,'../public/game.js'),'utf8');
+const server=fs.readFileSync(path.join(__dirname,'../server.js'),'utf8');
+const mock=(handedness,gamepad=true,hand=false)=>({handedness,gamepad:gamepad?{buttons:Array(6)}:null,gripSpace:gamepad?{}:null,targetRaySpace:{},hand:hand?{}:null});
+let sources=[mock('left'),mock('left',false,true),mock('right'),mock('right',false,true)];
+const selected=controls.selectControllerSources(sources);
+assert.equal(selected.left,sources[0],'left controller wins over hand-tracking');
+assert.equal(selected.right,sources[2],'right controller wins over hand-tracking');
+assert.equal(controls.selectControllerSources([mock('left'),mock('left')]).right,null,'two left sources must never create a fake right');
+assert.equal(controls.selectControllerSources([mock('left'),mock('right')]).right.handedness,'right');
+assert.ok(!game.includes("if(q.touch){ball(q.hand[0]"),'no second hand-like contact marker');
+assert.ok(!game.includes('localPaw(ghost'),'no duplicate ghost paws');
+assert.ok(game.includes('No visible paw for a detached arm')&&game.includes('localPaw(q.hand,col,q.basis||q.yaw||0,q.pose||[0,0,0])'),'tracked hand is drawn once unless severed');
+const launch=motion.preserveJump({x:3.4,y:-1,z:-2.4});
+assert.equal(launch.x,3.4,'jump retains horizontal momentum exactly');assert.equal(launch.z,-2.4,'jump retains horizontal momentum exactly');
+assert.ok(launch.y>=motion.settings.jumpSpeed,'jump lifts upward');
+assert.equal(motion.jumpBuffered(1000,1100),true);assert.equal(motion.jumpBuffered(1000,1200),false);
+assert.equal(motion.coyoteJump(1000,1100),true);assert.equal(motion.coyoteJump(1000,1200),false);
+assert.ok(game.includes("showRoundNotice('winner',title,sub,10500)"),'winner bubble');
+assert.ok(game.includes("m.monster===clientId?'monster':'survivor'"),'player-specific role bubble');
+assert.ok(game.includes('drawRoundNotice(head)'),'VR stereoscopic overlay');
+assert.ok(server.includes('winningTeam,winners'),'server sends named winners');
+console.log('PASS: one visible paw per hand, duplicated input rejection, jump momentum/coyote/buffer, VR roles and named winners');
