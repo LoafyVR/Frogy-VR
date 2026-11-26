@@ -1,0 +1,17 @@
+{
+  "name": "frogy",
+  "version": "16.7.0",
+  "private": true,
+  "description": "Frogy v16.7 Quest VR: stability movement fixes + Camera Lab POV/follow/selfie/tripod/handheld video and optional microphone",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run-all.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

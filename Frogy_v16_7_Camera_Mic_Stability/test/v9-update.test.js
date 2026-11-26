@@ -1,0 +1,44 @@
+'use strict';
+const assert=require('node:assert/strict');
+const {redeem,ownerAllowed}=require('../codes.js');
+const {normalizeProfile}=require('../economy.js');
+const M=require('../public/movement.js');
+function account(id='FOWNER'){return {publicId:id,crickets:100,dabloons:0,redeemedCodes:[]};}
+const user=account('FOTHER');
+assert.equal(redeem(user,'frog').ok,true);
+assert.equal(user.crickets,600);assert.equal(user.dabloons,500);
+assert.equal(redeem(user,'FROG').ok,false,'code cannot be redeemed twice');
+assert.equal(redeem(user,'free').ok,true);
+assert.equal(user.crickets,700);assert.equal(user.dabloons,600);
+assert.equal(redeem(user,'DJHQW',{FROGY_DEV_PUBLIC_IDS:'FOWNER'}).ok,true,'owner funds now available to all');
+assert.equal(redeem(user,'EMPSH',{FROGY_DEV_PUBLIC_IDS:'FOWNER'}).ok,true,'owner title now available to all');
+assert.equal(user.ownerTag,true);
+const owner=account();
+assert.equal(ownerAllowed(owner,{FROGY_DEV_PUBLIC_IDS:'FOWNER,FTEST'}),true);
+assert.equal(redeem(owner,'empsh',{FROGY_DEV_PUBLIC_IDS:'FOWNER'}).ok,true);
+assert.equal(owner.ownerTag,true);
+assert.equal(redeem(owner,'DJHQW',{FROGY_DEV_PUBLIC_IDS:'FOWNER'}).ok,true);
+assert.equal(owner.crickets,10100);assert.equal(owner.dabloons,10000);
+assert.equal(redeem(owner,'djhqw',{FROGY_DEV_PUBLIC_IDS:'FOWNER'}).ok,true,'DJHQW is repeatable by owner');
+assert.equal(owner.crickets,20100);assert.equal(owner.dabloons,20000);
+assert.ok(!owner.redeemedCodes.includes('DJHQW'));
+const afterRestart=normalizeProfile(JSON.parse(JSON.stringify(owner)),'owner-token');
+assert.equal(afterRestart.crickets,20100);assert.equal(afterRestart.dabloons,20000);
+assert.equal(afterRestart.ownerTag,true,'OWNER status remains stored');
+assert.equal(redeem(afterRestart,'DJHQW',{FROGY_DEV_PUBLIC_IDS:'FOWNER'}).ok,true);
+assert.equal(afterRestart.crickets,30100);assert.equal(afterRestart.dabloons,30000);
+assert.equal(redeem(afterRestart,'EMPSH',{FROGY_DEV_PUBLIC_IDS:'FOWNER'}).ok,false,'OWNER unlock one-use');
+assert.equal(redeem(account('FOTHER'),'DJHQW').ok,true);
+// The module must never mutate a balance or owner label on an invalid request.
+const b=account();assert.equal(redeem(b,'BADCODE').ok,false);assert.equal(b.crickets,100);
+// Ground presses now produce an upward impulse independent of A-button jump.
+const surf={type:'floor',point:[0,.17,0]};
+const first=M.strokeContact(null,[0,1.05,0],surf,1/80,1.25,1000);
+const down=M.strokeContact(first.contact,[0,.99,-.01],surf,1/80,1.25,1013);
+assert.ok(down.push&&down.push.up>1.3,'downward paw press launches body');
+assert.ok(down.push.up<4.3,'launch impulse capped');
+const still=M.strokeContact(down.contact,[0,.99,-.01],surf,1/80,1.25,1026);
+assert.equal(still.push,null,'stationary palm must not create phantom jump');
+const up=M.strokeContact(down.contact,[0,1.45,-.01],null,1/80,1.25,1039);
+assert.equal(up.contact,null,'lifting paw releases floor');
+console.log('PASS v9: single-use public/OWNER codes, repeatable authorized 10k DJHQW, persisted balances and OWNER title, grounded push-off and head/hand orientation paths');

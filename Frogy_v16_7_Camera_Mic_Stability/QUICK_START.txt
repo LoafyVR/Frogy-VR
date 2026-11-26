@@ -1,0 +1,14 @@
+FROGY v16.7 — CAMERA + MICROPHONE + MOVEMENT STABILITY
+
+Render Root Directory:
+Frogy_v16_7_Camera_Mic_Stability
+
+Upload the entire folder inside this ZIP to GitHub using GitHub Desktop.
+In Render choose that folder as Root Directory and deploy the latest commit.
+Check /health for version 16.7.0.
+
+Open X menu → SETTINGS → Camera Lab (Beta). Enable MIC ON only if you want to record your voice.
+Test POV/Follow camera first on Quest, then test recording and saving a clip.
+Video downloads are NOT guaranteed to appear in Meta Gallery.
+
+WARNING: On-device Quest audio + VR performance have not yet been verified.
