@@ -1,0 +1,17 @@
+{
+  "name": "frogy",
+  "version": "16.10.0",
+  "private": true,
+  "description": "Frogy v16.10: v15.4 movement rollback with short-stride fix; retains all v16.9 gameplay and Camera Lab",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run-all.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

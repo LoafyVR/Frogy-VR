@@ -1,0 +1,16 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const game=fs.readFileSync(path.join(__dirname,'..','public','game.js'),'utf8');
+const server=fs.readFileSync(path.join(__dirname,'..','server.js'),'utf8');
+const world=require('../public/world.js');
+assert(game.includes('function handPoseFromButtons(buttons={})'),'button-pressure hand pose helper exists');
+assert(game.includes('thumbA:gp.buttons?.[4]?.value')&&game.includes('thumbB:gp.buttons?.[5]?.value'),'thumb curl uses thumb button pressure');
+assert(game.includes('grip:gp.buttons?.[1]?.value')&&game.includes('trigger:gp.buttons?.[0]?.value'),'outer/trigger finger curls use analog grip and trigger pressure');
+assert(game.includes('drawLocalBodyFirstPerson'),'first-person visible torso/arms renderer exists');
+assert(game.includes('function elbowFor(shoulder,hand'),'two-joint arm IK helper exists');
+assert(game.includes('bodyYaw:bodyTrack.yaw')&&game.includes('bodyPitch:bodyTrack.pitch'),'subtle body tracking is synced into move packets');
+assert(game.includes('const idle=frogIdle(p.id,t);')&&game.includes('if(idle.lick&&!monster)'), 'blinking and rare lip lick are rendered');
+assert(server.includes('lCurl:p.lCurl||[0,0,0]')&&server.includes('bodyYaw:p.bodyYaw??p.yaw'),'server replicates finger curls and body follow');
+assert.equal(world.SIZE,58,'maps are slightly smaller again in v16.2');
+assert(world.maps.every(m=>m.cover.length>=258),'maps are denser in v16.2');
+console.log('PASS v16.2: articulated frog hands, synced body follow, first-person arms, idle blink/lick and smaller denser arenas');
