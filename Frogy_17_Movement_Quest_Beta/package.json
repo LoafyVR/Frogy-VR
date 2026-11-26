@@ -1,0 +1,17 @@
+{
+  "name": "frogy",
+  "version": "17.0.0",
+  "private": true,
+  "description": "Frogy v17: experimental contact-only movement rewrite, preserving the v16.10 game and Camera Lab",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run-all.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}
