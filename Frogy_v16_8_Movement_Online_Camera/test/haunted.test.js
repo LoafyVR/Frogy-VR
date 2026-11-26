@@ -1,0 +1,30 @@
+'use strict';
+const assert=require('node:assert/strict'), fs=require('node:fs'), path=require('node:path'), vm=require('node:vm');
+const root=path.resolve(__dirname,'..'),world=require('../public/world.js');
+assert.equal(world.SIZE,58); // Slightly smaller v16.1 arenas
+assert.equal(world.maps.length,3);
+assert.equal(new Set(world.maps.map(m=>m.name)).size,3);
+assert.ok(world.maps[0].cover.filter(o=>o.type==='shack').length>2,'Swamp has distinct shacks');
+assert.ok(world.maps[1].cover.some(o=>o.type==='chapel'),'Cemetery has a collision-aware chapel landmark');
+assert.ok(world.maps[2].cover.filter(o=>o.type==='labwall').length>=12,'Facility has corridor wall collision cover');
+assert.ok(world.maps[2].cover.some(o=>o.type==='reactor'),'Facility has reactor landmark');
+assert.notDeepEqual(world.maps[0].sky,world.maps[1].sky);
+assert.notDeepEqual(world.maps[1].fog,world.maps[2].fog);
+let drawCalls=[];const context={WorldData:world,Math,Float32Array,Uint16Array,mesh:(v,n,i)=>({v,n,i,c:i.length}),draw:(m,transform,col)=>drawCalls.push({triangles:m.i.length/3,color:col.join(',')}),mat:()=>[]};
+vm.createContext(context);
+const code=fs.readFileSync(path.join(root,'public/landmarks.js'),'utf8')+'\nthis.FrogyLandmarks=FrogyLandmarks;';
+vm.runInContext(code,context);
+const fingerprints=[];
+for(let t=0;t<3;t++){
+ drawCalls=[];context.FrogyLandmarks.draw(t);
+ const triangles=drawCalls.reduce((sum,x)=>sum+x.triangles,0);
+ assert.ok(triangles>400,'Map '+t+' builds significant unique geometry');
+ assert.ok(drawCalls.length>=6,'Map '+t+' uses batched multi-material environment');
+ assert.ok(drawCalls.every(x=>x.triangles>0));
+ fingerprints.push(drawCalls.map(x=>x.triangles+':'+x.color).join('|'));
+}
+assert.equal(new Set(fingerprints).size,3,'Maps have distinct visual geometry and materials');
+const html=fs.readFileSync(path.join(root,'public/index.html'),'utf8');
+assert.match(fs.readFileSync(path.join(root,'public/bootstrap.js'),'utf8'),/landmarks\.js/);
+assert.match(fs.readFileSync(path.join(root,'public/game.js'),'utf8'),/FrogyLandmarks\.draw\(t\)/);
+console.log('PASS: swamp, cemetery, facility have distinct collision landmarks, sky/fog, and batched scene geometry.');

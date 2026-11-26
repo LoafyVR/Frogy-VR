@@ -1,0 +1,9 @@
+FROGY v16.8 — VR MOVEMENT STABILITY + PLAYERS ONLINE + CAMERA LAB
+
+1. Unzip and copy Frogy_v16_8_Movement_Online_Camera into your GitHub repository root.
+2. Push the commit using GitHub Desktop (browser uploads have a 100-file limit).
+3. Set Render Root Directory exactly: Frogy_v16_8_Movement_Online_Camera
+4. Deploy latest commit, then open /health and confirm version 16.8.0.
+5. Check the Players Online counter on the launcher. It counts VR-active players only.
+6. In VR open X → Settings → Camera Lab for POV/follow/selfie/tripod/handheld and MIC ON.
+7. Test arms, jumping, collision/leaning, monster movement, and optional Tadpole on a real Quest.
