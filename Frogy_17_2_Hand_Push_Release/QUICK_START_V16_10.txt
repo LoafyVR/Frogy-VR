@@ -1,0 +1,12 @@
+FROGY V16.10 - MOVEMENT-ONLY ROLLBACK
+====================================
+1. Unzip this archive.
+2. Put the whole Frogy_v16_10_Classic_Movement_Restore folder at the top of your LoafyVR/Frogy-VR GitHub repository using GitHub Desktop.
+3. Commit and Push origin.
+4. Render -> Frogy-VR -> Settings -> Root Directory:
+   Frogy_v16_10_Classic_Movement_Restore
+5. Deploy latest commit and verify https://frogy-vr.onrender.com/health says 16.10.0.
+
+Only movement reverted to v15.4, with a focused short-stroke fix.
+Everything else is the v16.9 game, including 7-second shared grapple cooldown.
+Test on a Quest before calling movement good.
