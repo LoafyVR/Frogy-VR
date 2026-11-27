@@ -1,0 +1,9 @@
+FROGY v16.9 — GROUNDED MOVEMENT + SHARED GRAPPLE COOLDOWN
+
+1. Unzip and copy Frogy_v16_9_Grounded_Movement_Grapple into the root of your GitHub repository using GitHub Desktop.
+2. Commit and Push origin (GitHub's website has a 100-file upload limit).
+3. Set Render Root Directory exactly: Frogy_v16_9_Grounded_Movement_Grapple
+4. Deploy latest commit; verify /health returns version 16.9.0.
+5. In Quest test standing grounded hand strokes, smaller grounded hand jump vs higher A jump, no freehand midair acceleration, tree/wall pushing and 7-second tongue cooldown shared by Y/B.
+6. Check weapons, maps, Players Online below Enter VR, and X → Settings → Camera Lab with optional MIC ON.
+7. Do not retune monster movement until normal frog movement is approved.
