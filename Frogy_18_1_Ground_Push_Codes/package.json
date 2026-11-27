@@ -1,0 +1,17 @@
+{
+  "name": "frogy",
+  "version": "18.1.0",
+  "private": true,
+  "description": "Frogy 18.1: grounded palm acquisition, session speed codes, TUFF badges",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run-all.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}
