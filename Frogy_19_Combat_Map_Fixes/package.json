@@ -1,0 +1,17 @@
+{
+  "name": "frogy",
+  "version": "19.0.0",
+  "private": true,
+  "description": "Frogy 19: crowded-map movement consistency, monster health scaling, quieter audio, and reliable weapons",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run-all.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

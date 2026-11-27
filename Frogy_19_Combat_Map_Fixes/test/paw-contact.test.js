@@ -1,0 +1,16 @@
+'use strict';
+const assert=require('node:assert/strict');
+const m=require('../public/movement.js');
+const p=(x,z)=>({type:'floor',point:[x,.17,z]});
+const fresh=m.stepContact(null,[0,1.1,0],{x:0,y:0,z:0},.016,p(0,0),1000,1.2);
+assert.ok(fresh.contact && !fresh.push,'first floor touch creates stable paw anchor');
+const forward=m.stepContact(fresh.contact,[0,1.1,-.12],{x:0,y:0,z:0},.016,p(0,-.12),1016,1.2);
+assert.ok(forward.push.dz>.09,'pulling your hand back pushes frog forward');
+const lateral=m.stepContact(fresh.contact,[-.12,1.1,0],{x:0,y:0,z:0},.016,p(-.12,0),1016,1.2);
+assert.ok(lateral.push.dx>.09,'lateral hand stroke pushes frog sideways');
+assert.equal(m.stepContact(fresh.contact,[0,1.1,-.12],{x:0,y:0,z:0},.016,null,1032,1.2).contact,null,'raising hand releases anchor');
+const newContact=m.stepContact(fresh.contact,[0,1.1,0],{x:0,y:0,z:0},.016,p(0,0),1950,1.2);
+assert.equal(newContact.contact.since,1000,'floor anchors persist until contact is actually released');
+assert.ok(m.virtualPaw([0,1.1,0],0,1.7,1.2)[1]<.34,'collision proxy reaches the floor');
+assert.equal(m.renderHand([0,1.1,0],{x:0,y:0,z:0})[1],1.1,'visible palm never shifts down to floor proxy');
+console.log('PASS: stable ground anchors, physically grounded paws, release, side/forward locomotion');
